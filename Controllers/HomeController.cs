@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OnlineQuizApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -10,6 +11,17 @@ namespace OnlineQuizApp.Controllers
     {
         public ActionResult Index()
         {
+            List<string> quizTypes = new List<string>(){ "Computer Science", "Sports", "Movies" };
+            ViewBag.Tests = quizTypes;
+            SessionQuiz curQuiz = null;
+            if (Session["SessionQuiz"] == null)
+            {
+                curQuiz = new SessionQuiz();
+            }
+            else
+            {
+                curQuiz = (SessionQuiz)Session["SessionQuiz"];
+            }
             return View();
         }
 
