@@ -26,17 +26,17 @@
         </div>
         <div class="form-group">
             <div class="col-md-3">@Html.Label("Enter Name")</div>
-            <div class="col-md-5">@Html.TextBoxFor(x => x.userName, null, new { @class="form-control" } )</div>
+            <div class="col-md-5">@Html.TextBoxFor(x => x.userName, Model.userName, new { @class="form-control" } )</div>
         </div>
         <div class="form-group">
             <div class="col-md-3">@Html.Label("Enter Email")</div>
-            <div class="col-md-5">@Html.TextBoxFor(x => x.email, null, new { @class="form-control" } )</div>
+            <div class="col-md-5">@Html.TextBoxFor(x => x.email, Model.email, new { @class="form-control" } )</div>
         </div>
         <!-- Submit Button -->
         <div class="form-group">
             <div class="col-md-3"></div>
             <div class="col-md-5">
-                <input type="button" value="Submit" class="btn btn-primary"/>
+                <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </div>
     </div>

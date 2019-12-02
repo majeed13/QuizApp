@@ -22,7 +22,27 @@ namespace OnlineQuizApp.Controllers
             {
                 curQuiz = (SessionQuiz)Session["SessionQuiz"];
             }
-            return View();
+            return View(curQuiz);
+        }
+
+        public ActionResult Instruction(SessionQuiz quiz)
+        {
+            if(quiz != null)
+            {
+                ViewBag.quizName = quiz.quizName;
+                ViewBag.quizDescription = "This is a sample description of one of the 3 types.";
+                ViewBag.quizDuration = "10";
+                ViewBag.numberOfQuestions = "10";
+            }
+            // Handle null quiz model passed in from Index home page
+            else
+            {
+                ViewBag.quizName = "None";
+                ViewBag.quizDescription = "This is a sample description of one of the 3 types.";
+                ViewBag.quizDuration = "10";
+                ViewBag.numberOfQuestions = "10";
+            }
+            return View(quiz);
         }
 
         public ActionResult About()

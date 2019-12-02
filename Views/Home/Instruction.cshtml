@@ -1,0 +1,59 @@
+﻿@model OnlineQuizApp.Models.SessionQuiz
+
+
+<div class="container">
+    <br />
+    <div class="row">
+        <div class="col-md-6">
+            <h2>@ViewBag.quizName</h2>
+            @ViewBag.quizDescription
+        </div>
+        <div class="col-md-6">
+            Test Duration : @(ViewBag.quizDuration) minutes
+            <br />Total Questions : @ViewBag.numberOfQuestions
+        </div>
+    </div>
+    <br /><br />
+    <div class="row">
+        <div class="col-md-12">
+            Before you begin, please read the following instructions carefully.
+        </div>
+    </div>
+
+    <h3>How perform best during the quiz..</h3>
+    <ul>
+        <li>Tip number 1 for best result</li>
+        <li>Tip number 2 for best result</li>
+        <li>Tip number 3 for best result</li>
+        <li>Tip number 4 for best result</li>
+        <li>Tip number 5 for best result</li>
+    </ul>
+
+    <h3>How to use this program?</h3>
+    <ul>
+        <li>The answers will not be recorded unless you click <span class="highlight"><b>Save & Next</b></span> button</li>
+        <li>Questions will be multiple choice, please select the answer you think is correct</li>
+        <li>There is no <b>End</b> or <b>Submit</b> buttons to end the quiz. All the previously saved answers will be be recorded.</li>
+        <li>The timer will begin immediately after you click the <span class="highlight"><b>Start</b> button below</span></li>
+    </ul>
+
+    <h3>Tips</h3>
+    <ul>
+        <li>Answer to the best of your abilities</li>
+        <li>It is ok to skip a question that is difficult and comeback to it later.</li>
+    </ul>
+
+    @if(Model != null)
+    {
+        using(Html.BeginForm("Register", "Home", FormMethod.Post, new { @id="formRegister" } ))
+        {
+            @Html.HiddenFor(x => Model.quizName)
+            @Html.HiddenFor(x => Model.userName)
+            @Html.HiddenFor(x => Model.email)
+            
+            <a href="Javascript:void(0)" onclick="getElementById('formRegister').submit();" class="btn btn-primary">Start</a>
+        }
+    }
+    <!-- end of class="container" -->
+</div>
+
