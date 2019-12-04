@@ -1,7 +1,9 @@
-﻿using OnlineQuizApp.Models;
+﻿using Newtonsoft.Json;
+using OnlineQuizApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Web;
 using System.Web.Mvc;
 
@@ -72,14 +74,85 @@ namespace OnlineQuizApp.Controllers
             }
 
             // add user to database table
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             
-            return View();
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            QuizResponse q = null;
+            using (var client = new HttpClient())
+            {
+                // set the base url address to get geo cords of passed in city
+                client.BaseAddress = new Uri("https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=multiple");
+                // get the response message for the city desired and using the correct API key
+                HttpResponseMessage response = client.GetAsync("").Result;
+                string result = response.Content.ReadAsStringAsync().Result;
+                q = JsonConvert.DeserializeObject<QuizResponse>(result);
+                this.Session["QuizResponse"] = q;
+            }
+                return RedirectToAction("QuizPage", new {@token = Session["QuizResponse"] });
         }
 
 
-        public ActionResult QuizPage(Guid token, int? qno)
+        public ActionResult QuizPage(QuizResponse q)
         {
-            return View();
+            /**
+            if(token == null)
+            {
+                TempData["message"] = "Invalid token. Please register and try again.";
+                return RedirectToAction("Index");
+            }
+            */
+            // check if the expiration time has passed
+            QuizResponse model = q;
+            ViewBag.question = model.Results[0].Question;
+            return View(model);
         }
         public ActionResult About()
         {
