@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Azure;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 using OnlineQuizApp.Models;
 using System;
 using System.Collections.Generic;
@@ -11,6 +14,8 @@ namespace OnlineQuizApp.Controllers
 {
     public class HomeController : Controller
     {
+        private CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
+                CloudConfigurationManager.GetSetting("StorageConnectionString"));
         public ActionResult Index()
         {
             List<string> quizTypes = new List<string>(){ "Computer Science", "Sports", "Movies" };
@@ -134,13 +139,35 @@ namespace OnlineQuizApp.Controllers
                 HttpResponseMessage response = client.GetAsync("").Result;
                 string result = response.Content.ReadAsStringAsync().Result;
                 q = JsonConvert.DeserializeObject<QuizResponse>(result);
-                this.Session["QuizResponse"] = q;
+                this.Session["TOKEN"] = Guid.NewGuid();
             }
-                return RedirectToAction("QuizPage", new {@token = Session["QuizResponse"] });
+            /**
+            // retrieve storage account access info
+            var tableClient = storageAccount.CreateCloudTableClient();
+            var tableRef = tableClient.GetTableReference("QustionsTable");
+            tableRef.CreateIfNotExists();
+            //var props = new Dictionary<string, EntityProperty>();
+            int i = 1;
+            foreach(Result s in q.Results)
+            {
+                Question toAdd = new Question();
+                toAdd.PartitionKey = s.Category;
+                toAdd.RowKey = (i++).ToString();
+                // gotta handle &quot somehow
+                toAdd.description = s.Question.Replace("&quot", "\"");
+                toAdd.choices = s.CorrectAnswer + ";" + s.IncorrectAnswers[0] + ";" + 
+                    s.IncorrectAnswers[1] + ";" + s.IncorrectAnswers[2];
+                toAdd.correct = s.CorrectAnswer;
+                tableRef.Execute(TableOperation.InsertOrMerge(toAdd));
+            }
+            */
+            Console.WriteLine(q.Results[0].Question);
+            TempData["q"] = q;
+            return RedirectToAction("QuizPage", new {@token = Session["TOKEN"]});
         }
 
 
-        public ActionResult QuizPage(QuizResponse q)
+        public ActionResult QuizPage(Guid token, int? qNum)
         {
             /**
             if(token == null)
@@ -150,9 +177,15 @@ namespace OnlineQuizApp.Controllers
             }
             */
             // check if the expiration time has passed
-            QuizResponse model = q;
-            ViewBag.question = model.Results[0].Question;
-            return View(model);
+            QuizResponse model = (QuizResponse)TempData["q"];
+            TempData["q"] = model;
+            if (qNum.GetValueOrDefault() < 1 )
+            {
+                qNum = 1;
+            }
+            var ques = model.Results[(int)qNum - 1].Question;
+            ViewBag.question = ques;
+            return View();
         }
         public ActionResult About()
         {
