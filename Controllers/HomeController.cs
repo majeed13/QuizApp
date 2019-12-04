@@ -30,7 +30,20 @@ namespace OnlineQuizApp.Controllers
             if(quiz != null)
             {
                 ViewBag.quizName = quiz.quizName;
-                ViewBag.quizDescription = "This is a sample description of one of the 3 types.";
+
+                if (ViewBag.quizName == "Computer Science")
+                {
+                    ViewBag.quizDescription = "This is a quiz that tests your basic/general knowledge of Computer Science";
+                }
+                else if (ViewBag.quizName == "Sports")
+                {
+                    ViewBag.quizDescription = "This is a quiz that tests your basic/general knowledge of Sports";
+                }
+                else
+                {
+                    ViewBag.quizDescription = "This is a quiz that tests your basic/general knowledge of Movies";
+                }
+                //ViewBag.quizDescription = "This is a sample description of one of the 3 types.";
                 ViewBag.quizDuration = "10";
                 ViewBag.numberOfQuestions = "10";
             }
