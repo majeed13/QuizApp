@@ -45,6 +45,24 @@ namespace OnlineQuizApp.Controllers
             return View(quiz);
         }
 
+        public ActionResult Register(SessionQuiz quiz)
+        {
+            if(quiz != null)
+            {
+                Session["SessionQuiz"] = quiz;
+            }
+              
+            if(quiz == null || string.IsNullOrEmpty(quiz.userName))
+            {
+                TempData["message"] = "Invalid details. Please re-enter your information and try again";
+                return RedirectToAction("Index");
+            }
+
+            // add user to database table
+            
+            return View();
+        }
+
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
