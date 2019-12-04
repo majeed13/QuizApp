@@ -185,7 +185,8 @@ namespace OnlineQuizApp.Controllers
             }
             var ques = model.Results[(int)qNum - 1].Question;
             ViewBag.question = ques;
-            return View();
+            ViewBag.qNum = qNum;
+            return View(model);
         }
         public ActionResult About()
         {
