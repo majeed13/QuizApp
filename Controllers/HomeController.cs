@@ -60,20 +60,72 @@ namespace OnlineQuizApp.Controllers
             return View(quiz);
         }
 
+        // Two things to do:
+        // 1. Check if the user already exists; add them as the user database 
+        // 2. Register them for the test
         public ActionResult Register(SessionQuiz quiz)
         {
-            if(quiz != null)
+            if (quiz != null)
             {
                 Session["SessionQuiz"] = quiz;
             }
               
-            if(quiz == null || string.IsNullOrEmpty(quiz.userName))
+            if (quiz == null || string.IsNullOrEmpty(quiz.userName))
             {
                 TempData["message"] = "Invalid details. Please re-enter your information and try again";
                 return RedirectToAction("Index");
             }
 
+            // Check if user exists in the user database
             // add user to database table
+            // Database portion not done yet
+
+
+            /*
+             * if (user == null)
+             * {
+             *     Create a new Student object (Done below)
+             *     and add it into the database
+             * }
+            */
+
+            // Creating a new Student registration process
+            Student user = new Student()
+            {
+                userName = quiz.userName,
+                email = quiz.email
+            };
+
+            // Testing Student object
+            Console.WriteLine("New User Created");
+            Console.WriteLine("Student User Name: " + user.userName);
+            Console.WriteLine("Student email: " + user.email);
+            Console.WriteLine("------------------------------");
+
+            // Add newly created user into the database
+
+            // Creating test registration and adding it into the student's profile?
+            Registration registration = new Registration()
+            {
+                studentName = user.userName,
+                quizName = quiz.quizName,
+                registerDate = DateTime.UtcNow
+            };
+
+            user.registrations.Add(registration);   // Adding the quiz registration into student's registration list
+
+            // Testing Registration object
+            foreach (Registration regi in user.registrations)
+            {
+                Console.WriteLine("New Registration for User");
+                Console.WriteLine("Student User Name: " + regi.studentName);
+                Console.WriteLine("Quiz Name: " + regi.quizName);
+                Console.WriteLine("Registration Date (UTC): " + regi.registerDate);
+            }
+
+            Console.WriteLine("------------------------------");
+
+            return View("QuizPage");
 
 
 
