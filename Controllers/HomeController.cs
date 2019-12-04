@@ -39,7 +39,7 @@ namespace OnlineQuizApp.Controllers
                 {
                     ViewBag.quizDescription = "This is a quiz that tests your basic/general knowledge of Sports";
                 }
-                else
+                else if (ViewBag.quizName == "Movies")
                 {
                     ViewBag.quizDescription = "This is a quiz that tests your basic/general knowledge of Movies";
                 }
@@ -76,6 +76,11 @@ namespace OnlineQuizApp.Controllers
             return View();
         }
 
+
+        public ActionResult QuizPage(Guid token, int? qno)
+        {
+            return View();
+        }
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
