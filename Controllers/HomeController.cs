@@ -125,58 +125,6 @@ namespace OnlineQuizApp.Controllers
 
             Console.WriteLine("------------------------------");
 
-            return View("QuizPage");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
             QuizResponse q = null;
             using (var client = new HttpClient())
             {
