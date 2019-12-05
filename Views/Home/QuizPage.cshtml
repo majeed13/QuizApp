@@ -1,18 +1,50 @@
 ﻿@model OnlineQuizApp.Models.QuizResponse
 
-<h2>QuizPage</h2>
-@Html.Raw(ViewBag.question)
-<br />
-@ViewBag.qNum
+@{ 
+    var qTotal = 10;
+}
 
-<table>
-    <tr>
-        @for(int i = 0; i < 10; i++)
-        {
-            <td>
-                <a href="@Url.Action("QuizPage", "Home", new { @token = Session["TOKEN"], @qNum = (i+1) } )">@(i+1)</a>
-            </td>
-        }
-    </tr>
-</table>
+<h1><span style="color:coral;"><i>Quiz</i></span> Progress</h1>
+<div>Remaining Time: <span id="minLeft"></span>:<span id="secLeft"></span></div>
+<div class="row">
+    <div class="col-md-10">
+        <table>
+            <tr>
+                <td><a href="javascript:void(0);" class="btn btn-primary" onclick="saveBackward(this);"><< Save . Previous</a></td>
+                <td><a href="@Url.Action("QuizPage", "Home", new { @token = Session["TOKEN"], @qNum = (ViewBag.qNum - 1) } )" class="btn"><<</a></td>
+                @for (int i = 1; i <= qTotal; i++)
+                {
+                    <td>
+                        <a href="@Url.Action("QuizPage", "Home", new { @token = Session["TOKEN"], @qNum = (i) } )" class="btn btn-default" style="margin:3px;">@i</a>
+                    </td>
+                }
+                <td><a href="@Url.Action("QuizPage", "Home", new { @token = Session["TOKEN"], @qNum = (ViewBag.qNum + 1) % (qTotal+1) } )" class="btn">>></a></td>
+                <td><a href="javascript:void(0);" class="btn btn-primary" onclick="saveForward(this);">Save . Next >></a></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-2">
+        <h2>Question : @(ViewBag.qNum)</h2>
+    </div>
+</div>
+
+<div class="row">
+    <p>
+        <br />
+        @Html.Raw(ViewBag.question)
+    </p>
+</div>
+
+<br />
+
+<div class="row">
+    @foreach (var item in ViewBag.qList)
+    {
+        <input type="checkbox" style="margin:5px;"/>@Html.Raw(item)
+        <br />
+    }
+</div>
 

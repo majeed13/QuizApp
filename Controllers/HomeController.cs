@@ -16,6 +16,10 @@ namespace OnlineQuizApp.Controllers
     {
         private CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
                 CloudConfigurationManager.GetSetting("StorageConnectionString"));
+
+
+        // random for shuffling choices
+        private Random rng = new Random();
         public ActionResult Index()
         {
             List<string> quizTypes = new List<string>(){ "Computer Science", "Sports", "Movies" };
@@ -186,6 +190,10 @@ namespace OnlineQuizApp.Controllers
             var ques = model.Results[(int)qNum - 1].Question;
             ViewBag.question = ques;
             ViewBag.qNum = qNum;
+            List<string> list = model.Results[(int)qNum - 1].IncorrectAnswers.ToList();
+            list.Add(model.Results[(int)qNum - 1].CorrectAnswer);
+            Shuffle(list);
+            ViewBag.qList = list;
             return View(model);
         }
         public ActionResult About()
@@ -200,6 +208,19 @@ namespace OnlineQuizApp.Controllers
             ViewBag.Message = "Your contact page.";
 
             return View();
+        }
+
+        private void Shuffle(List<string> list )
+        {
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                var val = list[k];
+                list[k] = list[n];
+                list[n] = val;
+            }
         }
     }
 }
