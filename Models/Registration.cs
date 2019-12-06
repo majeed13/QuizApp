@@ -7,6 +7,5 @@ namespace OnlineQuizApp.Models
         public string quizName { get; set; }
         public string registerDate { get; set; }
         public Guid token { get; set; }
-        public int score { get; set; }
     }
 }
