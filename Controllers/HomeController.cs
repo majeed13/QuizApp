@@ -18,7 +18,6 @@ namespace OnlineQuizApp.Controllers
         private CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
                 CloudConfigurationManager.GetSetting("StorageConnectionString"));
 
-
         // random for shuffling choices
         private Random rng = new Random();
         public ActionResult Index()
@@ -86,10 +85,12 @@ namespace OnlineQuizApp.Controllers
                 return RedirectToAction("Index");
             }
 
+            /* WE CAN ERASE THIS LATER; MOVED TO FINISHPAGE
             // retrieve storage account access info for students
             var tableClient = storageAccount.CreateCloudTableClient();
             var tableRef = tableClient.GetTableReference("UserTable");  // get the reference to user table
             tableRef.CreateIfNotExists();   // create a table if there was no reference
+            */
 
             // Creating a new Student registration process
             Student user = new Student(quiz.email, quiz.name)
@@ -105,9 +106,9 @@ namespace OnlineQuizApp.Controllers
                 studentName = user.name,
                 quizName = quiz.quizName,
                 registerDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                score = 0
             };
 
+            /* WE CAN ERASE THIS LATER; MOVED TO FINISH PAGE
             Console.WriteLine("-------- Registration Information --------");
             Console.WriteLine("Token: " + registration.token.ToString());
             Console.WriteLine("Student name: " + registration.studentName);
@@ -139,7 +140,7 @@ namespace OnlineQuizApp.Controllers
                 Console.WriteLine("Insert Error Occurred");
                 Console.WriteLine(ex);
             }
-            
+            */
 
             QuizResponse q = null;
             using (var client = new HttpClient())
@@ -231,10 +232,51 @@ namespace OnlineQuizApp.Controllers
             AnswerModel ans = (AnswerModel)Session["SessionAnswerModel"];
             QuizResponse q = (QuizResponse)Session["SessionQuestions"];
             SessionQuiz sQuiz = (SessionQuiz)Session["SessionQuiz"];
+            Registration registration = (Registration)Session["SessionRegistration"];
+            Student user = (Student)Session["SessionUser"];
+
             ViewBag.questionModel = q;
             ViewBag.ansList = ans.userAnswers;
             ViewBag.cat = sQuiz.quizName;
             ViewBag.score = ans.correctAnswers.ToString() + " correct out of 10";
+
+            // retrieve storage account access info for students
+            var tableClient = storageAccount.CreateCloudTableClient();
+            var tableRef = tableClient.GetTableReference("UserTable");  // get the reference to user table
+            tableRef.CreateIfNotExists();   // create a table if there was no reference
+
+            Console.WriteLine("-------- Registration Information --------");
+            Console.WriteLine("Token: " + registration.token.ToString());
+            Console.WriteLine("Student name: " + registration.studentName);
+            Console.WriteLine("Quiz type: " + registration.quizName);
+            Console.WriteLine("Registration Date: " + registration.registerDate);
+            Console.WriteLine("Score: " + ans.correctAnswers);
+
+            // if the user already exists, it'll just merge (registration time updated)
+            // if the user does not exist, it'll insert the new user
+            tableRef.Execute(TableOperation.InsertOrMerge(user));
+
+            string value = registration.registerDate.ToString() + "/" + registration.quizName + "/" + ans.correctAnswers;
+            Console.WriteLine("Entity (Token): " + registration.token.ToString());
+            Console.WriteLine("Entity Attribute (date/quiz/score): " + value);
+
+            string propertyName = "_" + registration.token.ToString().Replace("-", "_");
+            var entity = new DynamicTableEntity(user.PartitionKey, user.RowKey, "*",
+                new Dictionary<string, EntityProperty>{
+                {propertyName, new EntityProperty(value)},
+            });
+
+            try
+            {
+                Console.WriteLine("Inserting Token and its values");
+                tableRef.Execute(TableOperation.InsertOrMerge(entity));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Insert Error Occurred");
+                Console.WriteLine(ex);
+            }
+
             return View();
         }
 
