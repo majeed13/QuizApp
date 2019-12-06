@@ -48,7 +48,7 @@
         using(Html.BeginForm("Register", "Home", FormMethod.Post, new { @id="formRegister" } ))
         {
             @Html.HiddenFor(x => Model.quizName)
-            @Html.HiddenFor(x => Model.userName)
+            @Html.HiddenFor(x => Model.name)
             @Html.HiddenFor(x => Model.email)
             
             <a href="Javascript:void(0)" onclick="getElementById('formRegister').submit();" class="btn btn-primary">Start</a>
