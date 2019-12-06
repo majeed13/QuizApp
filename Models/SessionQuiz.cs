@@ -8,7 +8,7 @@ namespace OnlineQuizApp.Models
     public class SessionQuiz
     {
         public string quizName { get; set; }
-        public string userName { get; set; }
+        public string name { get; set; }
         public string email { get; set; }
     }
 }

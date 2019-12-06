@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
 using OnlineQuizApp.Models;
@@ -16,7 +17,6 @@ namespace OnlineQuizApp.Controllers
     {
         private CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
                 CloudConfigurationManager.GetSetting("StorageConnectionString"));
-
 
         // random for shuffling choices
         private Random rng = new Random();
@@ -79,62 +79,43 @@ namespace OnlineQuizApp.Controllers
                 Session["SessionQuiz"] = quiz;
             }
               
-            if (quiz == null || string.IsNullOrEmpty(quiz.userName))
+            if (quiz == null || string.IsNullOrEmpty(quiz.name))
             {
                 TempData["message"] = "Invalid details. Please re-enter your information and try again";
                 return RedirectToAction("Index");
             }
 
-            // Check if user exists in the user database
-            // add user to database table
-            // Database portion not done yet
-
-
-            /*
-             * if (user == null)
-             * {
-             *     Create a new Student object (Done below)
-             *     and add it into the database
-             * }
-            */
+            // retrieve storage account access info for students
+            var tableClient = storageAccount.CreateCloudTableClient();
+            var tableRef = tableClient.GetTableReference("UserTable");  // get the reference to user table
+            tableRef.CreateIfNotExists();   // create a table if there was no reference
 
             // Creating a new Student registration process
-            Student user = new Student()
+            Student user = new Student(quiz.email, quiz.name)
             {
-                userName = quiz.userName,
+                name = quiz.name,
                 email = quiz.email
             };
 
             // Testing Student object
             Console.WriteLine("New User Created");
-            Console.WriteLine("Student User Name: " + user.userName);
+            Console.WriteLine("Student User Name: " + user.name);
             Console.WriteLine("Student email: " + user.email);
             Console.WriteLine("------------------------------");
 
-            // Add newly created user into the database
+            // if the user already exists, it'll just merge (registration time updated)
+            // if the user does not exist, it'll insert the new user
+            tableRef.Execute(TableOperation.InsertOrMerge(user));
 
             // Creating test registration and adding it into the student's profile?
             Registration registration = new Registration()
             {
                 //var token = Guid.NewGuid();
-                studentName = user.userName,
+                studentName = user.name,
                 quizName = quiz.quizName,
                 registerDate = DateTime.UtcNow
                 //var score = 0;
             };
-
-            user.registrations.Add(registration);   // Adding the quiz registration into student's registration list
-
-            // Testing Registration object
-            foreach (Registration regi in user.registrations)
-            {
-                Console.WriteLine("New Registration for User");
-                Console.WriteLine("Student User Name: " + regi.studentName);
-                Console.WriteLine("Quiz Name: " + regi.quizName);
-                Console.WriteLine("Registration Date (UTC): " + regi.registerDate);
-            }
-
-            Console.WriteLine("------------------------------");
 
             QuizResponse q = null;
             using (var client = new HttpClient())
