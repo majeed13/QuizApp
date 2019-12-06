@@ -190,6 +190,7 @@ namespace OnlineQuizApp.Controllers
             ViewBag.qList = list;
             return View(model);
         }
+
         [ValidateInput(false)]
         public ActionResult RecordAnswer(FormCollection frm)
         {
@@ -208,7 +209,7 @@ namespace OnlineQuizApp.Controllers
             // if so, go to finish page
             if (userAns.totalSubmitted == 10)
             {
-                return RedirectToAction("Results");
+                return RedirectToAction("FinishPage", "Home", new { @token = Session["TOKEN"] } );
             }
             return RedirectToAction("QuizPage", new { @token = Session["TOKEN"], @qNum = qNum + 1 });
         }

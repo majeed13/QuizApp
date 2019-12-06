@@ -1,13 +1,18 @@
-﻿@{
-    Layout = null;
+﻿
+@{
+    ViewBag.Title = "FinishPage";
 }
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>FinishPage</title>
-</head>
-<body>
-</body>
-</html>
+<h2>FinishPage</h2>
 
+<h1><span style="color:coral;"><i>Quiz</i></span> Review Page</h1>
+<div class="row">
+    <h3>Quiz Category : (Display Category)</h3>
+    <h3>Score : (Display score)</h3>
+    <h4>Display Questions and User Submitted Answers</h4>
+    <h1 style="color:royalblue">Thank you for taking the quiz. Click the button below to return to Home page.</h1>
+    @using (Html.BeginForm("Index", "Home", FormMethod.Post))
+    {
+        <input type="submit" value="Go Back To Home" class="btn btn-primary">
+    }
+</div>
