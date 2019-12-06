@@ -229,6 +229,12 @@ namespace OnlineQuizApp.Controllers
         public ActionResult FinishPage(Guid token)
         {
             AnswerModel ans = (AnswerModel)Session["SessionAnswerModel"];
+            QuizResponse q = (QuizResponse)Session["SessionQuestions"];
+            SessionQuiz sQuiz = (SessionQuiz)Session["SessionQuiz"];
+            ViewBag.questionModel = q;
+            ViewBag.ansList = ans.userAnswers;
+            ViewBag.cat = sQuiz.quizName;
+            ViewBag.score = ans.correctAnswers.ToString() + " correct out of 10";
             return View();
         }
 

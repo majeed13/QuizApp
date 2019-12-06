@@ -7,9 +7,20 @@
 
 <h1><span style="color:coral;"><i>Quiz</i></span> Review Page</h1>
 <div class="row">
-    <h3>Quiz Category : (Display Category)</h3>
-    <h3>Score : (Display score)</h3>
+    <h3>Quiz Category : @ViewBag.cat</h3>
+    <h3>Score : @ViewBag.score</h3>
     <h4>Display Questions and User Submitted Answers</h4>
+    @for (int i = 0; i < 10; i++)
+    {
+       
+        <h4>@(i + 1 + "-") @Html.Raw(" " + ViewBag.questionModel.Results[i].Question)</h4>
+        <br />
+        @Html.Raw("User Slected Answer : " + ViewBag.ansList[i])
+        <br />
+        @Html.Raw("Correct Answer: " + ViewBag.questionModel.Results[i].CorrectAnswer)
+        <br />
+        <br />
+    }
     <h1 style="color:royalblue">Thank you for taking the quiz. Click the button below to return to Home page.</h1>
     @using (Html.BeginForm("Index", "Home", FormMethod.Post))
     {
