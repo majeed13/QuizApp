@@ -157,6 +157,7 @@ namespace OnlineQuizApp.Controllers
             this.Session["SessionRegistration"] = registration;
             this.Session["SessionAnswerModel"] = new AnswerModel();
             this.Session["SessionQuestions"] = q;
+            this.Session["QuizTimeExpire"] = DateTime.UtcNow.AddSeconds(240); 
 
             return RedirectToAction("QuizPage", new {@token = Session["TOKEN"]});
         }

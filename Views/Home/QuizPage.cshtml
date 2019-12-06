@@ -3,6 +3,8 @@
 
 @{
     var qTotal = 10;
+    var endTime = ((DateTime)Session["QuizTimeExpire"]);
+    var timeRemain = TimeSpan.FromTicks(endTime.Ticks - DateTime.UtcNow.Ticks).TotalSeconds.ToString("#");
 }
 
 <h1><span style="color:coral;"><i>Quiz</i></span> Progress</h1>
@@ -62,9 +64,46 @@
 }
 
 <script>
-    function saveForeward(sender)
+    var secondsRem = @timeRemain;
+    var secondsCount = secondsRem % 60;
+
+    function numFormat(n)
     {
-        $('#answer').val('foreward');
-        document.getElementById('form').submit();
+        if (n < 10)
+        {
+            return '0' + n;
+        }
+        else
+        {
+            return n + '';
+        }
     }
+
+    function tick()
+    {
+        document.getElementById('secLeft').innerText = numFormat(secondsCount);
+        document.getElementById('minLeft').innerText = numFormat(parseInt(secondsRem / 60));
+
+        var theTicking = setInterval(function () {
+            if (secondsCount == 0) {
+                    secondsCount = 60;
+                }
+            if (secondsRem > 0) {
+                secondsRem -= 1;
+                secondsCount -= 1;
+                document.getElementById('secLeft').innerText = numFormat(secondsCount);
+                document.getElementById('minLeft').innerText = numFormat(parseInt(secondsRem / 60));
+                if (secondsCount == 0) {
+                    secondsCount = 60;
+                }
+            }
+            else
+            {
+                alert('Quiz time has expired');
+                clearInterval(theTicking);
+            }
+        }, 1000);
+    }
+
+    tick();
 </script>
