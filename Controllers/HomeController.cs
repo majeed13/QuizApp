@@ -17,7 +17,7 @@ namespace OnlineQuizApp.Controllers
     {
         private CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
                 CloudConfigurationManager.GetSetting("StorageConnectionString"));
-        
+
 
         // random for shuffling choices
         private Random rng = new Random();
@@ -117,7 +117,29 @@ namespace OnlineQuizApp.Controllers
 
             // if the user already exists, it'll just merge (registration time updated)
             // if the user does not exist, it'll insert the new user
-            tableRef.Execute(TableOperation.InsertOrMerge(user)); 
+            tableRef.Execute(TableOperation.InsertOrMerge(user));
+
+            string value = registration.registerDate.ToString() + "/" + registration.quizName + "/" + registration.score;
+            Console.WriteLine("Entity (Token): " + registration.token.ToString());
+            Console.WriteLine("Entity Attribute (date/quiz/score): " + value);
+
+            string propertyName = "_" + registration.token.ToString().Replace("-", "_");
+            var entity = new DynamicTableEntity(user.PartitionKey, user.RowKey, "*",
+                new Dictionary<string, EntityProperty>{
+                {propertyName, new EntityProperty(value)},
+            });
+            
+            try
+            {
+                Console.WriteLine("Inserting Token and its values");
+                tableRef.Execute(TableOperation.InsertOrMerge(entity));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Insert Error Occurred");
+                Console.WriteLine(ex);
+            }
+            
 
             QuizResponse q = null;
             using (var client = new HttpClient())
@@ -131,12 +153,11 @@ namespace OnlineQuizApp.Controllers
                 this.Session["TOKEN"] = Guid.NewGuid(); //registration.token;
             }
 
-            //this.Session["SessionUser"] = user;
-            //this.Session["SessionRegistration"] = registration;
+            this.Session["SessionUser"] = user;
+            this.Session["SessionRegistration"] = registration;
             this.Session["SessionAnswerModel"] = new AnswerModel();
-            
-
             this.Session["SessionQuestions"] = q;
+
             return RedirectToAction("QuizPage", new {@token = Session["TOKEN"]});
         }
 
