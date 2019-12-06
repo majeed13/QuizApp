@@ -17,6 +17,7 @@ namespace OnlineQuizApp.Controllers
     {
         private CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
                 CloudConfigurationManager.GetSetting("StorageConnectionString"));
+        
 
         // random for shuffling choices
         private Random rng = new Random();
@@ -54,7 +55,7 @@ namespace OnlineQuizApp.Controllers
                 {
                     ViewBag.quizDescription = "This is a quiz that tests your basic/general knowledge of Movies";
                 }
-                //ViewBag.quizDescription = "This is a sample description of one of the 3 types.";
+
                 ViewBag.quizDuration = "10";
                 ViewBag.numberOfQuestions = "10";
             }
@@ -97,25 +98,26 @@ namespace OnlineQuizApp.Controllers
                 email = quiz.email
             };
 
-            // Testing Student object
-            Console.WriteLine("New User Created");
-            Console.WriteLine("Student User Name: " + user.name);
-            Console.WriteLine("Student email: " + user.email);
-            Console.WriteLine("------------------------------");
-
-            // if the user already exists, it'll just merge (registration time updated)
-            // if the user does not exist, it'll insert the new user
-            tableRef.Execute(TableOperation.InsertOrMerge(user));
-
             // Creating test registration and adding it into the student's profile?
             Registration registration = new Registration()
             {
-                //var token = Guid.NewGuid();
+                token = Guid.NewGuid(),
                 studentName = user.name,
                 quizName = quiz.quizName,
-                registerDate = DateTime.UtcNow
-                //var score = 0;
+                registerDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                score = 0
             };
+
+            Console.WriteLine("-------- Registration Information --------");
+            Console.WriteLine("Token: " + registration.token.ToString());
+            Console.WriteLine("Student name: " + registration.studentName);
+            Console.WriteLine("Quiz type: " + registration.quizName);
+            Console.WriteLine("Registration Date: " + registration.registerDate);
+            Console.WriteLine("Score: " + registration.score);
+
+            // if the user already exists, it'll just merge (registration time updated)
+            // if the user does not exist, it'll insert the new user
+            tableRef.Execute(TableOperation.InsertOrMerge(user)); 
 
             QuizResponse q = null;
             using (var client = new HttpClient())
@@ -199,6 +201,12 @@ namespace OnlineQuizApp.Controllers
             }
             return toR;
         }
+
+        public ActionResult FinishPage()
+        {
+            return View();
+        }
+
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
