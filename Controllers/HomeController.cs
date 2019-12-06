@@ -131,6 +131,7 @@ namespace OnlineQuizApp.Controllers
 
             //this.Session["SessionUser"] = user;
             //this.Session["SessionRegistration"] = registration;
+            this.Session["SessionAnswerModel"] = new AnswerModel();
             
 
             this.Session["SessionQuestions"] = q;
@@ -154,6 +155,8 @@ namespace OnlineQuizApp.Controllers
             {
                 qNum = 1;
             }
+            TempData["qNum"] = qNum;
+            TempData["correct"] = model.Results[(int)qNum - 1].CorrectAnswer;
             var ques = model.Results[(int)qNum - 1].Question;
             ViewBag.question = ques;
             ViewBag.qNum = qNum;
@@ -163,12 +166,39 @@ namespace OnlineQuizApp.Controllers
             ViewBag.qList = list;
             return View(model);
         }
-
-        public ActionResult RecordAnswer(AnswerModel ans, int? qNum)
+        [ValidateInput(false)]
+        public ActionResult RecordAnswer(FormCollection frm)
         {
-            return View();
+            //update Session AnswerModel
+            AnswerModel userAns = (AnswerModel)Session["SessionAnswerModel"];
+            string ans = frm["answer"].ToString();
+            int qNum = (int)TempData["qNum"];
+            userAns.userAnswers.Insert((qNum - 1), ans);
+            if (ans.Equals((string)TempData["correct"]))
+            {
+                userAns.correctAnswers++;
+            }
+            userAns.totalSubmitted++;
+            // check if user has submitted 10 total answers
+            // if so, go to finish page
+            if (userAns.totalSubmitted == 10)
+            {
+                return RedirectToAction("Results");
+            }
+            Session["SessionAnswerModel"] = userAns;
+            return RedirectToAction("QuizPage", new { @token = Session["TOKEN"], @qNum = qNum + 1 });
         }
 
+        public string Results()
+        {
+            AnswerModel ans = (AnswerModel)Session["SessionAnswerModel"];
+            string toR = "";
+            foreach(string s in ans.userAnswers)
+            {
+                toR += s + " ; ";
+            }
+            return toR;
+        }
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";

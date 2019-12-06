@@ -8,7 +8,7 @@
 <h1><span style="color:coral;"><i>Quiz</i></span> Progress</h1>
 <div>Remaining Time: <span id="minLeft"></span>:<span id="secLeft"></span></div>
 
-@using (Html.BeginForm("PostAnswer", "Home", FormMethod.Post, new { @id = "form" }))
+@using (Html.BeginForm("RecordAnswer", "Home", FormMethod.Post, new { @id = "form" }))
 {
     <input type="hidden" name="Direction" value="forward" />
     <input type="hidden" name="Token" value="@(Session["TOKEN"])" />
@@ -27,7 +27,8 @@
                         </td>
                     }
                     <td><a href="@Url.Action("QuizPage", "Home", new { @token = Session["TOKEN"], @qNum = (ViewBag.qNum + 1) % (qTotal + 1) })" class="btn">>></a></td>
-                    <td><a href="javascript:void(0);" class="btn btn-primary" onclick="saveForward(this);">Save . Next >></a></td>
+                    <!--<td><a href="javascript:void(0);" class="btn btn-primary" onclick="submit();">Save . Next >></a></td>-->
+                    <td><input type="submit" value="Save . Next >>" class="btn btn-primary"></td>
                 </tr>
             </table>
         </div>
@@ -51,8 +52,9 @@
     <div class="row">
         @for (int i = 0; i < ViewBag.qList.Count; i++)
         {
-            //@Html.RadioButtonFor(x => Model.userAnswer, "checked");
-            <input name="userAnswer" type="checkbox" style="margin:5px;" />@Html.Raw(ViewBag.qList[i])
+            string s = Html.Raw(ViewBag.qList[i]).ToString();
+            @Html.RadioButton("answer", s) @Html.Raw(ViewBag.qList[i])
+            //<input name="userAnswer" type="checkbox" style="margin:5px;" />@Html.Raw(ViewBag.qList[i])
             <br />
         }
     </div>

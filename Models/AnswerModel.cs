@@ -5,16 +5,16 @@ using System.Web;
 
 namespace OnlineQuizApp.Models
 {
-    public class Choices
-    {
-        public string option { get; set; }
-        public bool isChecked { get; set; }
-
-    }
-
     public class AnswerModel
     {
-        public string userAnswer { get; set; }
-
+        public AnswerModel()
+        {
+            userAnswers = new List<string>(10);
+            correctAnswers = 0;
+            totalSubmitted = 0;
+        }
+        public List<string> userAnswers { get; set; }
+        public int correctAnswers { get; set; }
+        public int totalSubmitted { get; set; }
     }
 }
