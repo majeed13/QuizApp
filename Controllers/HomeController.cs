@@ -116,9 +116,11 @@ namespace OnlineQuizApp.Controllers
             // Creating test registration and adding it into the student's profile?
             Registration registration = new Registration()
             {
+                //var token = Guid.NewGuid();
                 studentName = user.userName,
                 quizName = quiz.quizName,
                 registerDate = DateTime.UtcNow
+                //var score = 0;
             };
 
             user.registrations.Add(registration);   // Adding the quiz registration into student's registration list
@@ -143,30 +145,14 @@ namespace OnlineQuizApp.Controllers
                 HttpResponseMessage response = client.GetAsync("").Result;
                 string result = response.Content.ReadAsStringAsync().Result;
                 q = JsonConvert.DeserializeObject<QuizResponse>(result);
-                this.Session["TOKEN"] = Guid.NewGuid();
+                this.Session["TOKEN"] = Guid.NewGuid(); //registration.token;
             }
-            /**
-            // retrieve storage account access info
-            var tableClient = storageAccount.CreateCloudTableClient();
-            var tableRef = tableClient.GetTableReference("QustionsTable");
-            tableRef.CreateIfNotExists();
-            //var props = new Dictionary<string, EntityProperty>();
-            int i = 1;
-            foreach(Result s in q.Results)
-            {
-                Question toAdd = new Question();
-                toAdd.PartitionKey = s.Category;
-                toAdd.RowKey = (i++).ToString();
-                // gotta handle &quot somehow
-                toAdd.description = s.Question.Replace("&quot", "\"");
-                toAdd.choices = s.CorrectAnswer + ";" + s.IncorrectAnswers[0] + ";" + 
-                    s.IncorrectAnswers[1] + ";" + s.IncorrectAnswers[2];
-                toAdd.correct = s.CorrectAnswer;
-                tableRef.Execute(TableOperation.InsertOrMerge(toAdd));
-            }
-            */
-            Console.WriteLine(q.Results[0].Question);
-            TempData["q"] = q;
+
+            //this.Session["SessionUser"] = user;
+            //this.Session["SessionRegistration"] = registration;
+            
+
+            this.Session["SessionQuesions"] = q;
             return RedirectToAction("QuizPage", new {@token = Session["TOKEN"]});
         }
 
@@ -181,7 +167,7 @@ namespace OnlineQuizApp.Controllers
             }
             */
             // check if the expiration time has passed
-            QuizResponse model = (QuizResponse)TempData["q"];
+            QuizResponse model = (QuizResponse)Session["SessionQuestion"];
             TempData["q"] = model;
             if (qNum.GetValueOrDefault() < 1 )
             {

@@ -1,50 +1,66 @@
 ﻿@model OnlineQuizApp.Models.QuizResponse
 
-@{ 
+@{
     var qTotal = 10;
 }
 
 <h1><span style="color:coral;"><i>Quiz</i></span> Progress</h1>
 <div>Remaining Time: <span id="minLeft"></span>:<span id="secLeft"></span></div>
-<div class="row">
-    <div class="col-md-10">
-        <table>
-            <tr>
-                <td><a href="javascript:void(0);" class="btn btn-primary" onclick="saveBackward(this);"><< Save . Previous</a></td>
-                <td><a href="@Url.Action("QuizPage", "Home", new { @token = Session["TOKEN"], @qNum = (ViewBag.qNum - 1) } )" class="btn"><<</a></td>
-                @for (int i = 1; i <= qTotal; i++)
-                {
-                    <td>
-                        <a href="@Url.Action("QuizPage", "Home", new { @token = Session["TOKEN"], @qNum = (i) } )" class="btn btn-default" style="margin:3px;">@i</a>
-                    </td>
-                }
-                <td><a href="@Url.Action("QuizPage", "Home", new { @token = Session["TOKEN"], @qNum = (ViewBag.qNum + 1) % (qTotal+1) } )" class="btn">>></a></td>
-                <td><a href="javascript:void(0);" class="btn btn-primary" onclick="saveForward(this);">Save . Next >></a></td>
-            </tr>
-        </table>
+
+@using (Html.BeginForm("PostAnswer", "Home", FormMethod.Post, new { @id = "form" }))
+{
+    <input type="hidden" name="Direction" value="forward" />
+    <input type="hidden" name="Token" value="@(Session["TOKEN"])" />
+    <input type="hidden" name="qNum" value="@(ViewBag.qNum)" />
+
+    <div class="row">
+        <div class="col-md-10">
+            <table>
+                <tr>
+                    <!--  <td><a href="javascript:void(0);" class="btn btn-primary" onclick="saveBackward(this);"><< Save . Previous</a></td>  -->
+                    <td><a href="@Url.Action("QuizPage", "Home", new { @token = Session["TOKEN"], @qNum = (ViewBag.qNum - 1) })" class="btn"><<</a></td>
+                    @for (int i = 1; i <= qTotal; i++)
+                    {
+                        <td>
+                            <a href="@Url.Action("QuizPage", "Home", new { @token = Session["TOKEN"], @qNum = (i) })" class="btn btn-default" style="margin:3px;">@i</a>
+                        </td>
+                    }
+                    <td><a href="@Url.Action("QuizPage", "Home", new { @token = Session["TOKEN"], @qNum = (ViewBag.qNum + 1) % (qTotal + 1) })" class="btn">>></a></td>
+                    <td><a href="javascript:void(0);" class="btn btn-primary" onclick="saveForward(this);">Save . Next >></a></td>
+                </tr>
+            </table>
+        </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-md-2">
-        <h2>Question : @(ViewBag.qNum)</h2>
+    <div class="row">
+        <div class="col-md-2">
+            <h2>Question : @(ViewBag.qNum)</h2>
+        </div>
     </div>
-</div>
 
-<div class="row">
-    <p>
-        <br />
-        @Html.Raw(ViewBag.question)
-    </p>
-</div>
+    <div class="row">
+        <p>
+            <br />
+            @Html.Raw(ViewBag.question)
+        </p>
+    </div>
 
-<br />
+    <br />
 
-<div class="row">
-    @foreach (var item in ViewBag.qList)
+    <div class="row">
+        @for (int i = 0; i < ViewBag.qList.Count; i++)
+        {
+            <input name="userAnswer" type="checkbox" style="margin:5px;" />@Html.Raw(ViewBag.qList[i])
+            <br />
+        }
+    </div>
+
+}
+
+<script>
+    function saveForeward(sender)
     {
-        <input type="checkbox" style="margin:5px;"/>@Html.Raw(item)
-        <br />
+        $('#answer').val('foreward');
+        document.getElementById('form').submit();
     }
-</div>
-
+</script>
