@@ -1,5 +1,6 @@
 ﻿@model OnlineQuizApp.Models.QuizResponse
 
+
 @{
     var qTotal = 10;
 }
@@ -50,6 +51,7 @@
     <div class="row">
         @for (int i = 0; i < ViewBag.qList.Count; i++)
         {
+            //@Html.RadioButtonFor(x => Model.userAnswer, "checked");
             <input name="userAnswer" type="checkbox" style="margin:5px;" />@Html.Raw(ViewBag.qList[i])
             <br />
         }

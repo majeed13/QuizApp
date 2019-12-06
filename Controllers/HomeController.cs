@@ -152,7 +152,7 @@ namespace OnlineQuizApp.Controllers
             //this.Session["SessionRegistration"] = registration;
             
 
-            this.Session["SessionQuesions"] = q;
+            this.Session["SessionQuestions"] = q;
             return RedirectToAction("QuizPage", new {@token = Session["TOKEN"]});
         }
 
@@ -167,8 +167,8 @@ namespace OnlineQuizApp.Controllers
             }
             */
             // check if the expiration time has passed
-            QuizResponse model = (QuizResponse)Session["SessionQuestion"];
-            TempData["q"] = model;
+            QuizResponse model = (QuizResponse)Session["SessionQuestions"];
+            //TempData["q"] = model;
             if (qNum.GetValueOrDefault() < 1 )
             {
                 qNum = 1;
@@ -182,6 +182,12 @@ namespace OnlineQuizApp.Controllers
             ViewBag.qList = list;
             return View(model);
         }
+
+        public ActionResult RecordAnswer(AnswerModel ans, int? qNum)
+        {
+            return View();
+        }
+
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
