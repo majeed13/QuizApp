@@ -181,13 +181,13 @@ namespace OnlineQuizApp.Controllers
                 userAns.correctAnswers++;
             }
             userAns.totalSubmitted++;
+            Session["SessionAnswerModel"] = userAns;
             // check if user has submitted 10 total answers
             // if so, go to finish page
             if (userAns.totalSubmitted == 10)
             {
                 return RedirectToAction("Results");
             }
-            Session["SessionAnswerModel"] = userAns;
             return RedirectToAction("QuizPage", new { @token = Session["TOKEN"], @qNum = qNum + 1 });
         }
 
@@ -199,11 +199,13 @@ namespace OnlineQuizApp.Controllers
             {
                 toR += s + " ; ";
             }
-            return toR;
+            string cor = ans.correctAnswers.ToString();
+            return toR + "<br>" + "Number Correct Answers = " + cor;
         }
 
-        public ActionResult FinishPage()
+        public ActionResult FinishPage(Guid token)
         {
+            AnswerModel ans = (AnswerModel)Session["SessionAnswerModel"];
             return View();
         }
 
