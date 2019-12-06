@@ -14,14 +14,13 @@
     {
        
         <h4>@(i + 1 + "-") @Html.Raw(" " + ViewBag.questionModel.Results[i].Question)</h4>
+        <span style="color:green;">@Html.Raw("User Slected Answer : " + ViewBag.ansList[i])</span>
         <br />
-        @Html.Raw("User Slected Answer : " + ViewBag.ansList[i])
-        <br />
-        @Html.Raw("Correct Answer: " + ViewBag.questionModel.Results[i].CorrectAnswer)
+        <p><span style="font-weight:bold;">@Html.Raw("Correct Answer: " + ViewBag.questionModel.Results[i].CorrectAnswer)</span></p>
         <br />
         <br />
     }
-    <h1 style="color:royalblue">Thank you for taking the quiz. Click the button below to return to Home page.</h1>
+    <h2 style="color:royalblue">Thank you for taking the quiz. Click the button below to return to Home page.</h2>
     @using (Html.BeginForm("Index", "Home", FormMethod.Post))
     {
         <input type="submit" value="Go Back To Home" class="btn btn-primary">
