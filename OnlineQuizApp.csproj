@@ -134,7 +134,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AnswerModel.cs" />
-    <Compile Include="Models\Question.cs" />
+    <Compile Include="Models\JsonModel.cs" />
     <Compile Include="Models\QuizResponse.cs" />
     <Compile Include="Models\SessionQuiz.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
