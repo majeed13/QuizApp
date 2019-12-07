@@ -27,12 +27,6 @@
             <div class="col-md-3">@Html.Label("Select Quiz")</div>
             <div class="col-md-5">
                 @Html.DropDownListFor(x => x.quizName, new SelectList(ViewBag.Tests), "-- Select Quiz --", new { @class="form-control"} )
-                <!--
-                <select class="form-control">
-                    <option value="Empty">-- Select Quiz --</option>
-                    <option value="Computer Science">Computer Science</option>
-                </select>
-                    -->
             </div>
         </div>
         <div class="form-group">

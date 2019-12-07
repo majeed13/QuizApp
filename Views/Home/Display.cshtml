@@ -1,0 +1,16 @@
+﻿@model OnlineQuizApp.Models.Student
+@{
+    ViewBag.Title = "Display";
+}
+
+<h2>Display</h2>
+<p>Email : @Model.email</p>
+<p>Name : @Model.name</p>
+
+<h2>Query Results</h2>
+<p>Email : @ViewBag.queryEmail</p>
+<p>Name : @ViewBag.queryName</p>
+@for (int i = 0; i < ViewBag.queryResults.Count; i++)
+{
+    <p>Result # @(i + 1) = @Html.Raw(ViewBag.queryResults[i])</p>
+}

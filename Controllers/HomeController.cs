@@ -282,11 +282,54 @@ namespace OnlineQuizApp.Controllers
 
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
+            // create a user obj to bind user input info
+            Student sModel = new Student();
+            // bind the fields in the from VIEW
 
-            return View();
+            ViewBag.Message = "Your application description page.";
+            // retrieve storage account access info for students
+            var tableClient = storageAccount.CreateCloudTableClient();
+            var tableRef = tableClient.GetTableReference("UserTable");  // get the reference to user table
+            tableRef.CreateIfNotExists();   // create a table if there was no reference
+
+
+            return View(sModel);
         }
 
+
+        public ActionResult Display(Student st)
+        {
+            // retrieve storage account access info for students
+            var tableClient = storageAccount.CreateCloudTableClient();
+            var tableRef = tableClient.GetTableReference("UserTable");  // get the reference to user table
+            tableRef.CreateIfNotExists();   // create a table if there was no reference
+            TableQuery<DynamicTableEntity> q = new TableQuery<DynamicTableEntity>().Where(
+                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, st.email)
+                );
+            List<string> quizResults = new List<string>();
+            var result = tableRef.ExecuteQuery(q);
+            if (result.Count() != 0)
+            {
+                foreach (DynamicTableEntity c in result)
+                {
+                    ViewBag.queryEmail = "Query Email: " + c.PartitionKey;
+                    ViewBag.queryName = "Query Name: " + c.RowKey;
+                    ViewBag.queryCount = c.Properties.Count;
+                    foreach (var pair in c.Properties)
+                    {
+                        //QueryResult_TextBox.Text += pair.Key + ": " + pair.Value.StringValue + Environment.NewLine;
+                        quizResults.Add("Key=" + pair.Key + " || Value=" + pair.Value.StringValue);
+                    }
+                    //QueryResult_TextBox.Text += "-----------------------------------" + Environment.NewLine;
+                }
+            }
+            else
+            {
+                quizResults.Add("No Matching Entries in Azure Table");
+            }
+            ViewBag.queryResults = quizResults;
+            return View(st);
+        }
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";

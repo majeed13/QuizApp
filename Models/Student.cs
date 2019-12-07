@@ -8,6 +8,7 @@ namespace OnlineQuizApp.Models
 {
     public class Student : TableEntity
     {
+        public Student() { }
         public Student(string email, string name)
         {
             PartitionKey = email;
