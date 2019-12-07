@@ -3,14 +3,45 @@
     ViewBag.Title = "Display";
 }
 
-<h2>Display</h2>
-<p>Email : @Model.email</p>
-<p>Name : @Model.name</p>
-
-<h2>Query Results</h2>
-<p>Email : @ViewBag.queryEmail</p>
-<p>Name : @ViewBag.queryName</p>
-@for (int i = 0; i < ViewBag.queryResults.Count; i++)
+<h2>Search Parameters</h2>
+<p>Email : @Model.PartitionKey</p>
+<p>Name : @Model.RowKey</p>
+<h2>Search Results</h2>
+<div class="col-sm-2">
+    Date
+</div>
+<div class="col-sm-2">
+    Quiz Category
+</div>
+<div class="col-sm-2">
+    Score
+</div>
+<div class="col-sm-6">
+    Token
+</div>
+@if (ViewBag.queryResults.Count == 0)
 {
-    <p>Result # @(i + 1) = @Html.Raw(ViewBag.queryResults[i])</p>
+    <br />
+    <p><span style="color:red; font-weight:bolder;">@ViewBag.zero</span></p>
+}
+else
+{
+    for (int i = 0; i < ViewBag.queryResults.Count; i++)
+    {
+        <div class="row">
+            <div class="col-sm-2">
+                @Html.Raw(ViewBag.queryResults[i][0])
+            </div>
+            <div class="col-sm-2">
+                @Html.Raw(ViewBag.queryResults[i][1])
+            </div>
+            <div class="col-sm-2">
+                @Html.Raw(ViewBag.queryResults[i][2])
+            </div>
+            <div class="col-sm-6">
+                @Html.Raw(ViewBag.queryResults[i][3])
+            </div>
+        </div>
+    <!--<p>@Html.Raw(ViewBag.queryResults[i])</p>-->
+    }
 }

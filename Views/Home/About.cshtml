@@ -7,14 +7,29 @@
 <h3 style="margin-top:3px">To retrieve info about previous Quiz results</h3>
 @using (Html.BeginForm("Display", "Home", FormMethod.Post))
 {
-    <div class="col-sm-2" style="padding:0px">@Html.Label("Enter Email")</div>
-    <div class="col-md-5">@Html.TextBoxFor(x => x.email, new { @class = "form-control" })</div>
-    <div class="col-sm-2" style="padding:0px">@Html.Label("Enter Name")</div>
-    <div class="col-md-5">@Html.TextBoxFor(x => x.name, new { @class = "form-control" })</div>
-    <div class="form-group">
-        <div class="col-md-3"></div>
-        <div class="col-md-5">
-            <button type="submit" class="btn btn-primary">Search</button>
+<div class="container">
+    <div class="row form-horizontal">
+        <div class="form-group">
+            <div class="col-sm-2" style="padding-right:0px;">@Html.Label("Enter Email")</div>
+            <div class="col-md-5" style="padding-left:0px;">@Html.TextBoxFor(x => x.PartitionKey, new { @class = "form-control", @required = "required" })</div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-2" style="padding-right:0px;">@Html.Label("Enter Name")</div>
+            <div class="col-md-5" style="padding-left:0px;">
+                @Html.TextBoxFor(x => x.RowKey, new
+                {
+                    @class = "form-control",
+                    @required = "required"
+                })
+            </div>
+        </div>
+    <!-- Submit Button -->
+        <div class="form-group">
+            <div class="col-sm-2"></div>
+            <div class="col-md-5">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
         </div>
     </div>
+</div>  
 }

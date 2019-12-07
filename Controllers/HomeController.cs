@@ -96,17 +96,13 @@ namespace OnlineQuizApp.Controllers
             */
 
             // Creating a new Student registration process
-            Student user = new Student(quiz.email, quiz.name)
-            {
-                name = quiz.name,
-                email = quiz.email
-            };
+            Student user = new Student(quiz.email, quiz.name);
 
             // Creating test registration and adding it into the student's profile?
             Registration registration = new Registration()
             {
                 token = Guid.NewGuid(),
-                studentName = user.name,
+                studentName = user.RowKey,
                 quizName = quiz.quizName,
                 registerDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
             };
@@ -241,7 +237,7 @@ namespace OnlineQuizApp.Controllers
             // create the JSON MODEL to upload to blob storage
             JsonModel blob = new JsonModel
             {
-                name = user.name,
+                name = user.RowKey,
                 quizCategory = sQuiz.quizName,
                 finalScore = ans.correctAnswers.ToString() + " out of 10"
             };
@@ -327,9 +323,9 @@ namespace OnlineQuizApp.Controllers
             var tableRef = tableClient.GetTableReference("UserTable");  // get the reference to user table
             tableRef.CreateIfNotExists();   // create a table if there was no reference
             TableQuery<DynamicTableEntity> q = new TableQuery<DynamicTableEntity>().Where(
-                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, st.email)
+                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, st.PartitionKey)
                 );
-            List<string> quizResults = new List<string>();
+            List<List<string>> quizResults = new List<List<string>>();
             var result = tableRef.ExecuteQuery(q);
             if (result.Count() != 0)
             {
@@ -341,14 +337,20 @@ namespace OnlineQuizApp.Controllers
                     foreach (var pair in c.Properties)
                     {
                         //QueryResult_TextBox.Text += pair.Key + ": " + pair.Value.StringValue + Environment.NewLine;
-                        quizResults.Add("Key=" + pair.Key + " || Value=" + pair.Value.StringValue);
+                        string[] v = pair.Value.StringValue.Split('/');
+                        List<string> toAdd = new List<string>();
+                        toAdd.Add(v[0]);
+                        toAdd.Add(v[1]);
+                        toAdd.Add(v[2]);
+                        toAdd.Add(pair.Key);
+                        quizResults.Add(toAdd);
                     }
                     //QueryResult_TextBox.Text += "-----------------------------------" + Environment.NewLine;
                 }
             }
             else
             {
-                quizResults.Add("No Matching Entries in Azure Table");
+                ViewBag.zero = "No matching entries in storage";
             }
             ViewBag.queryResults = quizResults;
             return View(st);
