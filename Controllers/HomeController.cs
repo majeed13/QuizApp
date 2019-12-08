@@ -13,6 +13,10 @@ using System.Net.Http;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using System.Threading.Tasks;
+using System.Configuration;
 
 namespace OnlineQuizApp.Controllers
 {
@@ -88,13 +92,6 @@ namespace OnlineQuizApp.Controllers
                 return RedirectToAction("Index");
             }
 
-            /* WE CAN ERASE THIS LATER; MOVED TO FINISHPAGE
-            // retrieve storage account access info for students
-            var tableClient = storageAccount.CreateCloudTableClient();
-            var tableRef = tableClient.GetTableReference("UserTable");  // get the reference to user table
-            tableRef.CreateIfNotExists();   // create a table if there was no reference
-            */
-
             // Creating a new Student registration process
             Student user = new Student(quiz.email, quiz.name);
 
@@ -106,40 +103,6 @@ namespace OnlineQuizApp.Controllers
                 quizName = quiz.quizName,
                 registerDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
             };
-
-            /* WE CAN ERASE THIS LATER; MOVED TO FINISH PAGE
-            Console.WriteLine("-------- Registration Information --------");
-            Console.WriteLine("Token: " + registration.token.ToString());
-            Console.WriteLine("Student name: " + registration.studentName);
-            Console.WriteLine("Quiz type: " + registration.quizName);
-            Console.WriteLine("Registration Date: " + registration.registerDate);
-            Console.WriteLine("Score: " + registration.score);
-
-            // if the user already exists, it'll just merge (registration time updated)
-            // if the user does not exist, it'll insert the new user
-            tableRef.Execute(TableOperation.InsertOrMerge(user));
-
-            string value = registration.registerDate.ToString() + "/" + registration.quizName + "/" + registration.score;
-            Console.WriteLine("Entity (Token): " + registration.token.ToString());
-            Console.WriteLine("Entity Attribute (date/quiz/score): " + value);
-
-            string propertyName = "_" + registration.token.ToString().Replace("-", "_");
-            var entity = new DynamicTableEntity(user.PartitionKey, user.RowKey, "*",
-                new Dictionary<string, EntityProperty>{
-                {propertyName, new EntityProperty(value)},
-            });
-            
-            try
-            {
-                Console.WriteLine("Inserting Token and its values");
-                tableRef.Execute(TableOperation.InsertOrMerge(entity));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Insert Error Occurred");
-                Console.WriteLine(ex);
-            }
-            */
 
             QuizResponse q = null;
             using (var client = new HttpClient())
@@ -296,6 +259,9 @@ namespace OnlineQuizApp.Controllers
                 Console.WriteLine(ex);
             }
 
+            Session["JsonSession"] = blob;
+            sendEmailAsync();
+
             return View();
         }
 
@@ -393,6 +359,86 @@ namespace OnlineQuizApp.Controllers
             using (MemoryStream ms = new MemoryStream(Encoding.ASCII.GetBytes(json)))
             {
                 newBlockBlob.UploadFromStream(ms);
+            }
+        }
+
+        private async Task sendEmailAsync()
+        {
+            string senderEmail = ConfigurationManager.AppSettings.Get("Email");
+            string senderInfo = ConfigurationManager.AppSettings.Get("SenderInfo");
+
+            AnswerModel ans = (AnswerModel)Session["SessionAnswerModel"];
+            QuizResponse q = (QuizResponse)Session["SessionQuestions"];
+            SessionQuiz sQuiz = (SessionQuiz)Session["SessionQuiz"];
+            JsonModel test = (JsonModel)Session["JsonSession"];
+            Registration register = (Registration)Session["SessionRegistration"];
+
+            try
+            {
+                var apiKey = ConfigurationManager.AppSettings.Get("SendGridAPIKey");
+                var client = new SendGridClient(apiKey);
+
+                var msg = new SendGrid.Helpers.Mail.SendGridMessage();
+
+                var from = new SendGrid.Helpers.Mail.EmailAddress();
+                from.Email = senderEmail;
+                from.Name = senderInfo;
+                msg.From = from;
+                msg.TemplateId = ConfigurationManager.AppSettings.Get("TemplateID");
+                msg.AddTo(sQuiz.email);
+
+                var message = new SendGrid.Helpers.Mail.Personalization
+                {
+                    TemplateData = new {
+                        name = sQuiz.name,
+                        quiz = sQuiz.quizName,
+                        score = ans.correctAnswers,
+                        numOfQuestions = ans.totalSubmitted,
+                        date = register.registerDate,
+                        token = register.token,
+                        question1 = test.questions[0].description,
+                        question2 = test.questions[1].description,
+                        question3 = test.questions[2].description,
+                        question4 = test.questions[3].description,
+                        question5 = test.questions[4].description,
+                        question6 = test.questions[5].description,
+                        question7 = test.questions[6].description,
+                        question8 = test.questions[7].description,
+                        question9 = test.questions[8].description,
+                        question10 = test.questions[9].description,
+                        correctAnswer1 = q.Results[0].CorrectAnswer,
+                        correctAnswer2 = q.Results[1].CorrectAnswer,
+                        correctAnswer3 = q.Results[2].CorrectAnswer,
+                        correctAnswer4 = q.Results[3].CorrectAnswer,
+                        correctAnswer5 = q.Results[4].CorrectAnswer,
+                        correctAnswer6 = q.Results[5].CorrectAnswer,
+                        correctAnswer7 = q.Results[6].CorrectAnswer,
+                        correctAnswer8 = q.Results[7].CorrectAnswer,
+                        correctAnswer9 = q.Results[8].CorrectAnswer,
+                        correctAnswer10 = q.Results[9].CorrectAnswer,
+                        userAnswer1 = ans.userAnswers[0],
+                        userAnswer2 = ans.userAnswers[1],
+                        userAnswer3 = ans.userAnswers[2],
+                        userAnswer4 = ans.userAnswers[3],
+                        userAnswer5 = ans.userAnswers[4],
+                        userAnswer6 = ans.userAnswers[5],
+                        userAnswer7 = ans.userAnswers[6],
+                        userAnswer8 = ans.userAnswers[7],
+                        userAnswer9 = ans.userAnswers[8],
+                        userAnswer10 = ans.userAnswers[9]
+                    }
+                };
+
+                message.Tos = new List<SendGrid.Helpers.Mail.EmailAddress>();
+                message.Tos.Add(new SendGrid.Helpers.Mail.EmailAddress { Email = sQuiz.email, Name = sQuiz.name });
+
+                msg.Personalizations = new List<SendGrid.Helpers.Mail.Personalization>() { message };
+
+                var response = await client.SendEmailAsync(msg);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
         }
     }
