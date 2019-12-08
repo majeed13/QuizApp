@@ -10,6 +10,10 @@ namespace OnlineQuizApp.Models
         public AnswerModel()
         {
             userAnswers = new List<string>(10);
+            for(int i = 0; i < 10; i++)
+            {
+                userAnswers.Add("");
+            }
             correctAnswers = 0;
             totalSubmitted = 0;
         }

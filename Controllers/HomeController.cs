@@ -62,7 +62,7 @@ namespace OnlineQuizApp.Controllers
                     ViewBag.quizDescription = "This is a quiz that tests your basic/general knowledge of Movies";
                 }
 
-                ViewBag.quizDuration = "10";
+                ViewBag.quizDuration = "4";
                 ViewBag.numberOfQuestions = "10";
             }
             // Handle null quiz model passed in from Index home page
@@ -70,7 +70,7 @@ namespace OnlineQuizApp.Controllers
             {
                 ViewBag.quizName = "None";
                 ViewBag.quizDescription = "This is a sample description of one of the 3 types.";
-                ViewBag.quizDuration = "10";
+                ViewBag.quizDuration = "4";
                 ViewBag.numberOfQuestions = "10";
             }
             return View(quiz);
@@ -96,15 +96,17 @@ namespace OnlineQuizApp.Controllers
             Student user = new Student(quiz.email, quiz.name);
 
             // Creating test registration and adding it into the student's profile?
+            DateTime now = DateTime.Now;
             Registration registration = new Registration()
             {
                 token = Guid.NewGuid(),
                 studentName = user.RowKey,
                 quizName = quiz.quizName,
-                registerDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                //registerDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                registerDate = now.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")
             };
-
-            string url = CloudConfigurationManager.GetSetting(quiz.quizName.Remove(' '));
+            string quizSetting = quiz.quizName.Replace(" ", "");
+            string url = CloudConfigurationManager.GetSetting(quizSetting);
             QuizResponse q = null;
             using (var client = new HttpClient())
             {
@@ -122,7 +124,7 @@ namespace OnlineQuizApp.Controllers
             this.Session["SessionRegistration"] = registration;
             this.Session["SessionAnswerModel"] = new AnswerModel();
             this.Session["SessionQuestions"] = q;
-            this.Session["QuizTimeExpire"] = DateTime.UtcNow.AddSeconds(240); 
+            this.Session["QuizTimeExpire"] = DateTime.UtcNow.AddSeconds(240);
 
             return RedirectToAction("QuizPage", new {@token = Session["TOKEN"]});
         }
@@ -163,12 +165,21 @@ namespace OnlineQuizApp.Controllers
             AnswerModel userAns = (AnswerModel)Session["SessionAnswerModel"];
             string ans = frm["answer"].ToString();
             int qNum = (int)TempData["qNum"];
-            userAns.userAnswers.Insert((qNum - 1), ans);
+            if (userAns.userAnswers[qNum - 1].Length > 0)
+            {
+                userAns.userAnswers.RemoveAt(qNum - 1);
+                userAns.userAnswers.Insert((qNum - 1), ans);
+            }
+            else
+            {
+                userAns.userAnswers.Insert((qNum - 1), ans);
+                userAns.totalSubmitted++;
+            }
+            //userAns.userAnswers.Insert((qNum - 1), ans);
             if (ans.Equals((string)TempData["correct"]))
             {
                 userAns.correctAnswers++;
             }
-            userAns.totalSubmitted++;
             Session["SessionAnswerModel"] = userAns;
             // check if user has submitted 10 total answers
             // if so, go to finish page
@@ -396,7 +407,7 @@ namespace OnlineQuizApp.Controllers
                         score = ans.correctAnswers,
                         numOfQuestions = ans.totalSubmitted,
                         date = register.registerDate,
-                        token = register.token.ToString().Replace('-','_'),
+                        token = "_" + register.token.ToString().Replace('-','_'),
                         question1 = test.questions[0].description,
                         question2 = test.questions[1].description,
                         question3 = test.questions[2].description,
