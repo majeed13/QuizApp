@@ -104,11 +104,13 @@ namespace OnlineQuizApp.Controllers
                 registerDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
             };
 
+            string url = CloudConfigurationManager.GetSetting(quiz.quizName.Remove(' '));
             QuizResponse q = null;
             using (var client = new HttpClient())
             {
                 // set the base url address to get geo cords of passed in city
-                client.BaseAddress = new Uri("https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=multiple");
+                //client.BaseAddress = new Uri("https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=multiple");
+                client.BaseAddress = new Uri(url);
                 // get the response message for the city desired and using the correct API key
                 HttpResponseMessage response = client.GetAsync("").Result;
                 string result = response.Content.ReadAsStringAsync().Result;
@@ -271,12 +273,13 @@ namespace OnlineQuizApp.Controllers
             Student sModel = new Student();
             // bind the fields in the from VIEW
 
+            /*
             ViewBag.Message = "Your application description page.";
             // retrieve storage account access info for students
             var tableClient = storageAccount.CreateCloudTableClient();
             var tableRef = tableClient.GetTableReference("UserTable");  // get the reference to user table
             tableRef.CreateIfNotExists();   // create a table if there was no reference
-
+            */
 
             return View(sModel);
         }
@@ -302,7 +305,6 @@ namespace OnlineQuizApp.Controllers
                     ViewBag.queryCount = c.Properties.Count;
                     foreach (var pair in c.Properties)
                     {
-                        //QueryResult_TextBox.Text += pair.Key + ": " + pair.Value.StringValue + Environment.NewLine;
                         string[] v = pair.Value.StringValue.Split('/');
                         List<string> toAdd = new List<string>();
                         toAdd.Add(v[0]);
@@ -310,8 +312,7 @@ namespace OnlineQuizApp.Controllers
                         toAdd.Add(v[2]);
                         toAdd.Add(pair.Key);
                         quizResults.Add(toAdd);
-                    }
-                    //QueryResult_TextBox.Text += "-----------------------------------" + Environment.NewLine;
+                    }  
                 }
             }
             else
@@ -395,7 +396,7 @@ namespace OnlineQuizApp.Controllers
                         score = ans.correctAnswers,
                         numOfQuestions = ans.totalSubmitted,
                         date = register.registerDate,
-                        token = register.token,
+                        token = register.token.ToString().Replace('-','_'),
                         question1 = test.questions[0].description,
                         question2 = test.questions[1].description,
                         question3 = test.questions[2].description,
